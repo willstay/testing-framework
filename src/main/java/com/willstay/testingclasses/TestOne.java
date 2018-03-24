@@ -4,7 +4,6 @@ import com.willstay.testingframework.annotations.After;
 import com.willstay.testingframework.annotations.Before;
 import com.willstay.testingframework.annotations.Test;
 
-
 import static com.willstay.testingframework.Asserts.assertTrue;
 import static com.willstay.testingframework.Asserts.assertEquals;
 import static com.willstay.testingframework.Asserts.assertNotNull;

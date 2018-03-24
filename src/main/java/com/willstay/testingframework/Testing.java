@@ -57,6 +57,7 @@ public class Testing {
     }
 
     private void callMethod(Method method) {
+        method.setAccessible(true);
         try {
             method.invoke(object);
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -71,7 +72,6 @@ public class Testing {
             e.printStackTrace();
         }
     }
-
 
     private List<Method> findAnnotationMethods(Class annotationClass) {
         List<Method> methodList = new ArrayList<>();
@@ -97,6 +97,4 @@ public class Testing {
         }
         return methodList;
     }
-
-
 }
