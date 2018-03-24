@@ -24,7 +24,6 @@ public class Testing {
 
     public void doTests() {
         parseClass();
-        createInstance();
         doMethods();
     }
 
@@ -44,6 +43,8 @@ public class Testing {
 
     private void doMethods() {
         for (Method method : testMethodList) {
+            createInstance();
+
             if (!beforeMethod.isEmpty()) {
                 callMethod(beforeMethod.get(0));
             }
