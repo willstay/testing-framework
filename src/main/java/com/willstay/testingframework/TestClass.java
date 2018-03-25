@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Testing {
+public class TestClass {
     private final Class testClass;
     private List<Method> testMethodList;
     private Method beforeMethod;
@@ -21,12 +21,12 @@ public class Testing {
     private Object object;
     private final Messenger messenger;
 
-    public Testing(Class testClass, Messenger messenger) {
+    public TestClass(Class testClass, Messenger messenger) {
         this.testClass = testClass;
         this.messenger = messenger;
     }
 
-    public void doTests() {
+    public void doTest() {
         parseClass();
         doMethods();
     }
@@ -56,14 +56,19 @@ public class Testing {
                 callMethod(method);
                 messenger.sendPassed(method.getName());
 
-                if (afterMethod != null) {
-                    callMethod(afterMethod);
-                }
             } catch (Throwable e) {
                 if (e instanceof TestFailedException) {
                     messenger.sendFailed(method.getName());
                 } else {
                     e.printStackTrace();
+                }
+            } finally {
+                if (afterMethod != null) {
+                    try {
+                        callMethod(afterMethod);
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
                 }
             }
         }
