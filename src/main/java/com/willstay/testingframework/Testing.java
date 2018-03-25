@@ -4,7 +4,9 @@ import com.willstay.testingframework.annotations.After;
 import com.willstay.testingframework.annotations.Before;
 import com.willstay.testingframework.annotations.Test;
 import com.willstay.testingframework.exception.NoTests;
+import com.willstay.testingframework.exception.TestFailedException;
 import com.willstay.testingframework.exception.TooManyAnnotations;
+import com.willstay.testingframework.messenger.Messenger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,9 +19,11 @@ public class Testing {
     private List<Method> beforeMethod;
     private List<Method> afterMethod;
     private Object object;
+    private final Messenger messenger;
 
-    public Testing(Class testClass) {
+    public Testing(Class testClass, Messenger messenger) {
         this.testClass = testClass;
+        this.messenger = messenger;
     }
 
     public void doTests() {
@@ -44,33 +48,41 @@ public class Testing {
     private void doMethods() {
         for (Method method : testMethodList) {
             createInstance();
+            try {
+                if (!beforeMethod.isEmpty()) {
+                    callMethod(beforeMethod.get(0));
+                }
 
-            if (!beforeMethod.isEmpty()) {
-                callMethod(beforeMethod.get(0));
-            }
+                callMethod(method);
+                messenger.sendPassed(method.getName());
 
-            callMethod(method);
-
-            if (!afterMethod.isEmpty()) {
-                callMethod(afterMethod.get(0));
+                if (!afterMethod.isEmpty()) {
+                    callMethod(afterMethod.get(0));
+                }
+            } catch (Throwable e) {
+                if (e instanceof TestFailedException) {
+                    messenger.sendFailed(method.getName());
+                }
             }
         }
     }
 
-    private void callMethod(Method method) {
+    private void callMethod(Method method) throws Throwable {
         method.setAccessible(true);
         try {
             method.invoke(object);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
         }
     }
 
     private void createInstance() {
         try {
             object = testClass.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

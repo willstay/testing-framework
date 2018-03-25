@@ -1,38 +1,26 @@
 package com.willstay.testingframework;
 
-import com.willstay.testingframework.messenger.SendToConsole;
+import com.willstay.testingframework.exception.TestFailedException;
 
 public class Asserts {
     private Asserts() {
     }
 
     public static void assertTrue(boolean condition) {
-        SendToConsole sendToConsole = new SendToConsole();
-        String msg = "assertTrue";
-        if (condition) {
-            sendToConsole.sendPassed(msg);
-        } else {
-            sendToConsole.sendFailed(msg);
+        if (!condition) {
+            throw new TestFailedException();
         }
     }
 
-    public static void assertEquals(Object expected, Object actual) {
-        SendToConsole sendToConsole = new SendToConsole();
-        String msg = "assertEquals";
-        if (expected.equals(actual)) {
-            sendToConsole.sendPassed(msg);
-        } else {
-            sendToConsole.sendFailed(msg);
+    public static void assertEquals(Object actual, Object expected) {
+        if (!actual.equals(expected)) {
+            throw new TestFailedException();
         }
     }
 
     public static void assertNotNull(Object o) {
-        SendToConsole sendToConsole = new SendToConsole();
-        String msg = "assertNotNull";
-        if (o != null) {
-            sendToConsole.sendPassed(msg);
-        } else {
-            sendToConsole.sendFailed(msg);
+        if (o == null) {
+            throw new TestFailedException();
         }
     }
 }
