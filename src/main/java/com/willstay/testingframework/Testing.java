@@ -62,6 +62,8 @@ public class Testing {
             } catch (Throwable e) {
                 if (e instanceof TestFailedException) {
                     messenger.sendFailed(method.getName());
+                } else {
+                    e.printStackTrace();
                 }
             }
         }
