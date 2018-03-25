@@ -16,8 +16,8 @@ import java.util.List;
 public class Testing {
     private final Class testClass;
     private List<Method> testMethodList;
-    private List<Method> beforeMethod;
-    private List<Method> afterMethod;
+    private Method beforeMethod;
+    private Method afterMethod;
     private Object object;
     private final Messenger messenger;
 
@@ -49,15 +49,15 @@ public class Testing {
         for (Method method : testMethodList) {
             createInstance();
             try {
-                if (!beforeMethod.isEmpty()) {
-                    callMethod(beforeMethod.get(0));
+                if (beforeMethod != null) {
+                    callMethod(beforeMethod);
                 }
 
                 callMethod(method);
                 messenger.sendPassed(method.getName());
 
-                if (!afterMethod.isEmpty()) {
-                    callMethod(afterMethod.get(0));
+                if (afterMethod != null) {
+                    callMethod(afterMethod);
                 }
             } catch (Throwable e) {
                 if (e instanceof TestFailedException) {
@@ -105,11 +105,14 @@ public class Testing {
         }
     }
 
-    private List<Method> findSingularAnnotation(Class annotationClass) throws TooManyAnnotations {
+    private Method findSingularAnnotation(Class annotationClass) throws TooManyAnnotations {
         List<Method> methodList = findAnnotationMethods(annotationClass);
         if (methodList.size() > 1) {
             throw new TooManyAnnotations(annotationClass.toString() + " can be one time");
         }
-        return methodList;
+        if (methodList.isEmpty()) {
+            return null;
+        }
+        return methodList.get(0);
     }
 }
